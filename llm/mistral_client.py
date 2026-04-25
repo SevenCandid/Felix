@@ -4,7 +4,7 @@ from core import config
 
 class MistralClient:
     def __init__(self):
-        self.api_key = os.getenv("MISTRAL_API_KEY")
+        self.api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("MISTRAL_API_KEY")
         self.url = config.MISTRAL_API_URL
         self.model = config.MISTRAL_MODEL
 
@@ -13,7 +13,7 @@ class MistralClient:
         Sends text to Mistral (via OpenRouter) with a strict timeout.
         """
         if not self.api_key:
-            raise Exception("MISTRAL_API_KEY not found")
+            raise Exception("OpenRouter/Mistral API key not found")
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",

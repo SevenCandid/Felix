@@ -101,11 +101,9 @@ micBtn.addEventListener("click", async () => {
     pulseWave.classList.add("active");
     setTimeout(() => pulseWave.classList.remove("active"), 1500);
 
-    const started = await Voice.startRecording(async (audioBlob) => {
+    const started = await Voice.startRecording(async (data) => {
         micBtn.classList.remove("active");
-        statusIndicator.innerText = "Transcribing...";
         
-        const data = await API.transcribe(audioBlob);
         if (data.text) {
             userInput.value = data.text;
             handleSend();
