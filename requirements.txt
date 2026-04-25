@@ -1,9 +1,9 @@
+flask
+flask-cors
 openai-whisper
-sounddevice
-numpy
-scipy
+google-generativeai
 pyttsx3
 python-dotenv
-torch
 requests
-google-generativeai
+gtts
+gunicorn

@@ -10,11 +10,12 @@ DURATION = 5  # Recording duration in seconds
 TEMP_AUDIO_FILE = "input.wav"
 
 # STT SETTINGS (Whisper)
-WHISPER_MODEL = "base"
+WHISPER_MODEL = "tiny" # Optimized for Cloud RAM (512MB)
 STT_LANGUAGE = "en"
 STT_TEMPERATURE = 0.0
 
-# TTS SETTINGS (pyttsx3)
+# TTS SETTINGS
+TTS_MODE = "google" # Options: "google" (cloud), "local" (pyttsx3)
 TTS_RATE = 260
 TTS_VOLUME = 1.0
 TTS_VOICE_INDEX = 0

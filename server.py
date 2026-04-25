@@ -73,5 +73,6 @@ def tts():
     return send_file(output_path, as_attachment=True)
 
 if __name__ == '__main__':
-    print("🚀 Felix Web Server starting at http://localhost:5000")
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    port = int(os.environ.get('PORT', 5000))
+    print(f"🚀 Felix Web Server starting at http://localhost:{port}")
+    app.run(host='0.0.0.0', port=port, debug=False)

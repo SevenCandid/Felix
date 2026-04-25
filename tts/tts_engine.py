@@ -1,68 +1,47 @@
 import pyttsx3
-from core import config
+from gtts import gTTS
+import os
+from core.config import TTS_RATE, TTS_VOLUME, TTS_VOICE_INDEX, TTS_MODE
 
 class TTSEngine:
     def __init__(self):
-        pass # Initialization moved to speak() to prevent state issues
+        self.mode = TTS_MODE
+        if self.mode == "local":
+            self.engine = pyttsx3.init()
+            self.setup_local()
+        else:
+            print("TTS: Using Google Cloud Mode")
 
-    def setup_voice(self):
-        """
-        Initializes voice settings based on config.
-        """
-        self.engine.setProperty('rate', config.TTS_RATE)
-        self.engine.setProperty('volume', config.TTS_VOLUME)
-        
+    def setup_local(self):
         voices = self.engine.getProperty('voices')
-        if config.TTS_VOICE_INDEX < len(voices):
-            self.engine.setProperty('voice', voices[config.TTS_VOICE_INDEX].id)
+        if TTS_VOICE_INDEX < len(voices):
+            self.engine.setProperty('voice', voices[TTS_VOICE_INDEX].id)
+        self.engine.setProperty('rate', TTS_RATE)
+        self.engine.setProperty('volume', TTS_VOLUME)
 
     def speak(self, text):
-        """
-        Converts text to speech. Re-initializes engine each time to ensure it works in loops.
-        """
-        if not text:
-            return
-            
-        print(f"[Felix TTS] Speaking: {text}")
-        
-        # Re-initialize engine for each speak call (common fix for Windows sapi5)
-        engine = pyttsx3.init()
-        
-        # Setup voice settings
-        engine.setProperty('rate', config.TTS_RATE)
-        engine.setProperty('volume', config.TTS_VOLUME)
-        voices = engine.getProperty('voices')
-        if config.TTS_VOICE_INDEX < len(voices):
-            engine.setProperty('voice', voices[config.TTS_VOICE_INDEX].id)
-            
-        engine.say(text)
-        engine.runAndWait()
-        
-        # Explicitly stop the engine
-        engine.stop()
+        if self.mode == "local":
+            self.engine.say(text)
+            self.engine.runAndWait()
+        else:
+            # For cloud mode, 'speak' isn't used as much as 'save_to_file' for the web
+            print(f"Felix says: {text}")
 
-    def save_to_file(self, text, filename):
-        """
-        Synthesizes text to an audio file.
-        """
-        if not text:
-            return
-            
-        engine = pyttsx3.init()
-        engine.setProperty('rate', config.TTS_RATE)
-        engine.setProperty('volume', config.TTS_VOLUME)
-        voices = engine.getProperty('voices')
-        if config.TTS_VOICE_INDEX < len(voices):
-            engine.setProperty('voice', voices[config.TTS_VOICE_INDEX].id)
-            
-        engine.save_to_file(text, filename)
-        engine.runAndWait()
-        engine.stop()
-
-    def set_voice(self, index):
-        voices = self.engine.getProperty('voices')
-        if index < len(voices):
-            self.engine.setProperty('voice', voices[index].id)
-
-    def set_speed(self, rate):
-        self.engine.setProperty('rate', rate)
+    def save_to_file(self, text, filename="output.mp3"):
+        """Saves text to audio file for web serving"""
+        try:
+            if self.mode == "google":
+                # Use gTTS (Cloud)
+                tts = gTTS(text=text, lang='en')
+                tts.save(filename)
+                return True
+            else:
+                # Use pyttsx3 (Local)
+                # Note: pyttsx3 save_to_file usually requires .wav on some systems
+                # We'll try to save it as the requested filename
+                self.engine.save_to_file(text, filename)
+                self.engine.runAndWait()
+                return True
+        except Exception as e:
+            print(f"TTS Error: {e}")
+            return False
